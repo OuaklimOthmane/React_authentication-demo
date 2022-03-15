@@ -11,11 +11,14 @@ const Login = (props) => {
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  //* Checking the form validation each time the state changes :
+  //! Checking the form validation each time the state changes :
   useEffect(() => {
-    setFormIsValid(
-      enteredEmail.includes("@") && enteredPassword.trim().length > 6
-    );
+    //* Debouncing the user inputs checking using a timer :
+    const identifier = setTimeout(() => {
+      setFormIsValid(
+        enteredEmail.includes("@") && enteredPassword.trim().length > 6
+      );
+    }, 500);
   }, [enteredEmail, enteredPassword]);
 
   const emailChangeHandler = (event) => {
@@ -89,3 +92,11 @@ const Login = (props) => {
 };
 
 export default Login;
+
+//! Debouncing the user inputs checking using a timer :
+//? Let's say here, we're executing this "setFormIsValid()" essentially on every keystroke, with every keystroke, this callback runs. Now, that's not a problem here. This function execution is fairly fast. But what you do in this "setFormIsValid()", that might be a problem. cause we are updating some state. This might already not be ideal. for this simple state update it won't be a problem, but of course it means that it triggers another function component execution, and that React again needs to check whether it needs to change something in the DOM. So even that might not be something you really wanna do for every keystroke. Now imagine you would do something more complex, like, for example, send an HTTP request to some backend where you check if a username is already in use. You don't wanna do that with every keystroke. Because if you do, that means you're going to be sending a lot of requests. but that might be a lot of unnecessary network traffic. So that's something you might wanna avoid .
+//? Instead, something you might want to do is that you collect a certain amount of keystrokes, or you simply wait for a pause of a certain time duration after a keystroke. And only if the pause is long enough, you go ahead and do implement "setFormIsValid()". So for example, here, while the user is actively typing, I might not wanna check if it's a valid email address. I care about when the user stops typing. So for example, when I type, and then I stop for, let's say, 500 milliseconds or longer, then I wanna check. Okay, the user seems to be done, let's see if it's valid. That's something we might wanna do. And the same for the password. Now that's a technique which is called "debouncing". We wanna debounce the user input. We wanna make sure we're not doing something with it on every keystroke, but once the user made a pause during typing. And with "useEffect", it's actually easy to implement. We can use 'setTimeout', to wait for, for example, 500 milliseconds until we execute some function. Now, in this function, we might want to check our form validity or to update our form validity. Now we would only do this after 500 milliseconds.
+//? Now, the trick is that we actually save the timer. And for the next keystroke, we clear it so that we only have one ongoing timer at a time. And only the last timer will, therefore, complete. And as long as the user keeps on typing, we always clear all other timers. And therefore, we only have one timer that completes, and that completes after 500 milliseconds, which is the delay the user has to issue a new keystroke to clear this timer.
+
+//! Cleanup function (clean the timer) :
+//? In the "useEffect" function,we can return a function, for example, an anonymous arrow function. But it could also be a named function . So we are returning this anonymous arrow function,and That's a so-called "cleanup" function. This will run as a cleanup process before "useEffect" executes this "setTimeout()" the next time. then, whenever this "useEffect" function runs, before it runs, except for the very first time when it runs, this "cleanup" function will run. And in addition, the "cleanup" function will run whenever the component you're specifying the effect in unmounts from the DOM. So whenever the component is reused. So the "cleanup" function runs before every new side effect function execution and before the component is removed. And it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.THerefore we can use the fact that "SetTimeout" actually returns an "idetifier" ,so with the built-in clearTimeout function in my "cleanup" function. There, I call "clearTimeout" and pass the identifier of this timeout to it. And this makes sure that whenever the cleanup function runs, I clear the "timer" that was set before this "cleanup" function ran, so in the last side effect function execution, so that when the next side-effect execution is due, we are able to set a new timer. So we clear the last timer before we set a new one.
