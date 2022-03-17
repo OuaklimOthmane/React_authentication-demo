@@ -44,14 +44,14 @@ const passwordReducer = function (state, action) {
 //?  I created this "emailReducer()" function outside of the component function. And I did so because inside of this reducer function, we won't need any data that's generated inside of the component function. So this reducer function can be created outside of the scope of this component function because it doesn't need to interact with anything defined inside of the component function. All the data which will be required and used inside of the reducer function will be passed into this function when it's executed by React automatically. So that's why we can define it outside off the component function here.
 
 const Login = (props) => {
-  //* State management using "useState()" :
+  //! State management using "useState()" :
   // const [enteredEmail, setEnteredEmail] = useState("");
   // const [emailIsValid, setEmailIsValid] = useState();
   // const [enteredPassword, setEnteredPassword] = useState("");
   // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  //* State management using "useReducer()" :
+  //! State management using "useReducer()" :
   const [emailState, emailDispatch] = useReducer(emailReducer, {
     value: "",
     isValid: null,
@@ -62,19 +62,26 @@ const Login = (props) => {
     isValid: null,
   });
 
+  //* Extracting the validity prop from the input states :
+  const { isValid: emailIsValid } = emailState.isValid;
+  const { isValid: passwordIsValid } = passwordState.isValid;
+
+  //? We can use them as dependencies 'cause they're related to the inputs value, which these laters make the code re-executed whenever the value has changed and this leads to many uneccessary effect execution, therefore we use the validity properties as dependencies to make the code re-run as long as the inputs validity changed instead of their values to minimize the number of check requests.
+
   //! Checking the form validation each time the state changes :
   useEffect(() => {
     //? Debouncing the user inputs checking using a timer :
     const identifier = setTimeout(() => {
-      setFormIsValid(emailState.isValid && passwordState.isValid);
+      setFormIsValid(emailIsValid && passwordIsValid);
     }, 500);
 
     //? Cleanup the timer :
     return () => {
       clearTimeout(identifier);
     };
-  }, [emailState, passwordState]);
+  }, [emailIsValid, passwordIsValid]);
 
+  //! Input change handling :
   const emailChangeHandler = (event) => {
     //  setEnteredEmail(event.target.value);
 
@@ -92,6 +99,7 @@ const Login = (props) => {
     emailDispatch({ type: "ON_BLUR" });
   };
 
+  //! validate input handling :
   const passwordChangeHandler = (event) => {
     // setEnteredPassword(event.target.value);
 
@@ -106,6 +114,7 @@ const Login = (props) => {
     passwordDispatch({ type: "ON_BLUR" });
   };
 
+  //! Submit form handling :
   const submitHandler = (event) => {
     event.preventDefault();
     props.onLogin(emailState.value, passwordState.value);
