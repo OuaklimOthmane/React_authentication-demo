@@ -22,14 +22,33 @@ const emailReducer = function (state, action) {
     isValid: false,
   };
 };
+
+const passwordReducer = function (state, action) {
+  if (action.type === "USER_INPUT")
+    return {
+      value: action.value,
+      isValid: action.value.trim().length > 6,
+    };
+
+  if (action.type === "ON_BLUR")
+    return {
+      value: state.value,
+      isValid: state.value.trim().length > 6,
+    };
+
+  return {
+    value: "",
+    isValid: false,
+  };
+};
 //?  I created this "emailReducer()" function outside of the component function. And I did so because inside of this reducer function, we won't need any data that's generated inside of the component function. So this reducer function can be created outside of the scope of this component function because it doesn't need to interact with anything defined inside of the component function. All the data which will be required and used inside of the reducer function will be passed into this function when it's executed by React automatically. So that's why we can define it outside off the component function here.
 
 const Login = (props) => {
   //* State management using "useState()" :
   // const [enteredEmail, setEnteredEmail] = useState("");
   // const [emailIsValid, setEmailIsValid] = useState();
-  const [enteredPassword, setEnteredPassword] = useState("");
-  const [passwordIsValid, setPasswordIsValid] = useState();
+  // const [enteredPassword, setEnteredPassword] = useState("");
+  // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
   //* State management using "useReducer()" :
@@ -38,18 +57,23 @@ const Login = (props) => {
     isValid: null,
   });
 
+  const [passwordState, passwordDispatch] = useReducer(passwordReducer, {
+    value: "",
+    isValid: null,
+  });
+
   //! Checking the form validation each time the state changes :
   useEffect(() => {
     //? Debouncing the user inputs checking using a timer :
     const identifier = setTimeout(() => {
-      setFormIsValid(emailState.isValid && enteredPassword.trim().length > 6);
+      setFormIsValid(emailState.isValid && passwordState.isValid);
     }, 500);
 
     //? Cleanup the timer :
     return () => {
       clearTimeout(identifier);
     };
-  }, [emailState.value, enteredPassword]);
+  }, [emailState.value, passwordState.value]);
 
   const emailChangeHandler = (event) => {
     //  setEnteredEmail(event.target.value);
@@ -69,18 +93,22 @@ const Login = (props) => {
   };
 
   const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
+    // setEnteredPassword(event.target.value);
+
+    passwordDispatch({ type: "USER_INPUT", value: event.target.value });
 
     // setFormIsValid(event.target.value.trim().length > 6 && emailState.isValid);
   };
 
   const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
+    // setPasswordIsValid(enteredPassword.trim().length > 6);
+
+    passwordDispatch({ type: "ON_BLUR" });
   };
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, enteredPassword);
+    props.onLogin(emailState.value, passwordState.value);
   };
 
   return (
@@ -102,14 +130,14 @@ const Login = (props) => {
         </div>
         <div
           className={`${classes.control} ${
-            passwordIsValid === false ? classes.invalid : ""
+            passwordState.isValid === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
-            value={enteredPassword}
+            value={passwordState.value}
             onChange={passwordChangeHandler}
             onBlur={validatePasswordHandler}
           />
