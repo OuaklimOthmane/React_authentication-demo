@@ -1,49 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
 
+const emailReducer = function (state, action) {
+  if (action.type === "USER_INPUT")
+    return {
+      value: action.value,
+      isValid: action.value.includes("@"),
+    };
+
+  if (action.type === "ON_BLUR")
+    return {
+      value: state.value,
+      isValid: state.value.includes("@"),
+    };
+
+  return {
+    value: "",
+    isValid: false,
+  };
+};
+//?  I created this "emailReducer()" function outside of the component function. And I did so because inside of this reducer function, we won't need any data that's generated inside of the component function. So this reducer function can be created outside of the scope of this component function because it doesn't need to interact with anything defined inside of the component function. All the data which will be required and used inside of the reducer function will be passed into this function when it's executed by React automatically. So that's why we can define it outside off the component function here.
+
 const Login = (props) => {
-  const [enteredEmail, setEnteredEmail] = useState("");
-  const [emailIsValid, setEmailIsValid] = useState();
+  //* State management using "useState()" :
+  // const [enteredEmail, setEnteredEmail] = useState("");
+  // const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState("");
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
+
+  //* State management using "useReducer()" :
+  const [emailState, emailDispatch] = useReducer(emailReducer, {
+    value: "",
+    isValid: null,
+  });
 
   //! Checking the form validation each time the state changes :
   useEffect(() => {
     //? Debouncing the user inputs checking using a timer :
     const identifier = setTimeout(() => {
-      setFormIsValid(
-        enteredEmail.includes("@") && enteredPassword.trim().length > 6
-      );
+      setFormIsValid(emailState.isValid && enteredPassword.trim().length > 6);
     }, 500);
 
     //? Cleanup the timer :
     return () => {
       clearTimeout(identifier);
     };
-  }, [enteredEmail, enteredPassword]);
+  }, [emailState.value, enteredPassword]);
 
   const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
+    //  setEnteredEmail(event.target.value);
 
-    // setFormIsValid(
-    //   event.target.value.includes('@') && enteredPassword.trim().length > 6
-    // );
+    emailDispatch({
+      type: "USER_INPUT",
+      value: event.target.value,
+    });
+
+    // setFormIsValid(emailState.isValid && enteredPassword.trim().length > 6);
+  };
+
+  const validateEmailHandler = () => {
+    //   setEmailIsValid(enteredEmail.includes("@"));
+
+    emailDispatch({ type: "ON_BLUR" });
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
 
-    // setFormIsValid(
-    //   event.target.value.trim().length > 6 && enteredEmail.includes('@')
-    // );
-  };
-
-  const validateEmailHandler = () => {
-    setEmailIsValid(enteredEmail.includes("@"));
+    // setFormIsValid(event.target.value.trim().length > 6 && emailState.isValid);
   };
 
   const validatePasswordHandler = () => {
@@ -52,7 +80,7 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(enteredEmail, enteredPassword);
+    props.onLogin(emailState.value, enteredPassword);
   };
 
   return (
@@ -60,14 +88,14 @@ const Login = (props) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailIsValid === false ? classes.invalid : ""
+            emailState.isValid === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="email">E-Mail</label>
           <input
             type="email"
             id="email"
-            value={enteredEmail}
+            value={emailState.value}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
