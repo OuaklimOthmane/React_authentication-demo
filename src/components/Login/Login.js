@@ -63,10 +63,10 @@ const Login = (props) => {
   });
 
   //* Extracting the validity prop from the input states :
-  const { isValid: emailIsValid } = emailState.isValid;
-  const { isValid: passwordIsValid } = passwordState.isValid;
+  const { isValid: emailIsValid } = emailState;
+  const { isValid: passwordIsValid } = passwordState;
 
-  //? We can use them as dependencies 'cause they're related to the inputs value, which these laters make the code re-executed whenever the value has changed and this leads to many uneccessary effect execution, therefore we use the validity properties as dependencies to make the code re-run as long as the inputs validity changed instead of their values to minimize the number of check requests.
+  //? We can use them as dependencies 'cause they're related to the inputs value, which these laters make the code re-executed whenever the value has changed and this leads to many uneccessary effect execution, therefore we use the validity properties as dependencies to make the code re-run as long as the inputs validity changed instead of their values to minimize the number of check requests. the key thing is NOT that we use destructuring but that we pass specific properties instead of the entire object as a dependency. Because the effect function would re-run whenever ANY property of the state Object changes, not just the one property our effect might depend on.
 
   //! Checking the form validation each time the state changes :
   useEffect(() => {
