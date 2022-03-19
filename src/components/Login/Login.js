@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+  useRef,
+} from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
@@ -119,16 +125,30 @@ const Login = (props) => {
   //! Create a context consumer :
   const ctx = useContext(AuthContext);
 
+  //! create inputs references :
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+
   //! Submit form handling :
   const submitHandler = (event) => {
     event.preventDefault();
     ctx.onLogin(emailState.value, passwordState.value);
+
+    //* Implementing focus input behavior :
+    if (formIsValid) {
+      ctx.onLogin(emailState.value, passwordState.value);
+    } else if (!emailIsValid) {
+      emailInputRef.current.focus();
+    } else {
+      passwordInputRef.current.focus();
+    }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input
+          ref={emailInputRef}
           id="email"
           label="E-Mail"
           type="email"
@@ -138,6 +158,7 @@ const Login = (props) => {
           onBlur={validateEmailHandler}
         />
         <Input
+          ref={passwordInputRef}
           id="password"
           label="Password"
           type="password"
