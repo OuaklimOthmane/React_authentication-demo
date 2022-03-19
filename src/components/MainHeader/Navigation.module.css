@@ -13,7 +13,8 @@
 
 .nav a {
   text-decoration: none;
-  color: white;
+  color: #cac9c9;
+  font-family: unset;
 }
 
 .nav a:hover,
@@ -23,8 +24,8 @@
 
 .nav button {
   font: inherit;
-  background: #dd0db0;
-  border: 1px solid #dd0db0;
+  background: linear-gradient(to left, #4b134f, #c94b4b);
+  border: 1px solid #51164f;
   padding: 0.5rem 1.5rem;
   color: white;
   cursor: pointer;

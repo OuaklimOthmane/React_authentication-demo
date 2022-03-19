@@ -11,24 +11,25 @@
 }
 
 .control label {
-  font-weight: bold;
+  font-weight: inherit;
   flex: 1;
-  color: #464646;
-  margin-bottom: 0.5rem;
+  color: #93334d;
+  /* margin-bottom: 0.5rem; */
 }
 
 .control input {
   flex: 3;
   font: inherit;
-  padding: 0.35rem 0.35rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 0.75rem 1.35rem;
+  border-radius: 3px;
+  border: 1px solid #be464b69;
+  background: #c2484c33;
 }
 
 .control input:focus {
   outline: none;
-  border-color: #4f005f;
-  background: #f6dbfc;
+  border-color: #32a72b;
+  background: #a4d4a1;
 }
 
 .control.invalid input {
