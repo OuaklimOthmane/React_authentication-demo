@@ -11,7 +11,6 @@ const AuthContext = React.createContext({
 export default AuthContext;
 
 //! Create custom context provider component :
-
 export const AuthContextProvider = function (props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 

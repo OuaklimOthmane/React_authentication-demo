@@ -89,7 +89,7 @@ const Login = (props) => {
     };
   }, [emailIsValid, passwordIsValid]);
 
-  //! Input change handling :
+  //! Email change handling :
   const emailChangeHandler = (event) => {
     //  setEnteredEmail(event.target.value);
 
@@ -101,13 +101,14 @@ const Login = (props) => {
     // setFormIsValid(emailState.isValid && enteredPassword.trim().length > 6);
   };
 
+  //! Email validation handling :
   const validateEmailHandler = () => {
     //   setEmailIsValid(enteredEmail.includes("@"));
 
     emailDispatch({ type: "ON_BLUR" });
   };
 
-  //! validate input handling :
+  //! Password change handling :
   const passwordChangeHandler = (event) => {
     // setEnteredPassword(event.target.value);
 
@@ -116,6 +117,7 @@ const Login = (props) => {
     // setFormIsValid(event.target.value.trim().length > 6 && emailState.isValid);
   };
 
+  //! Password validation handling :
   const validatePasswordHandler = () => {
     // setPasswordIsValid(enteredPassword.trim().length > 6);
 
